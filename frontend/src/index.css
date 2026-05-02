@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-ink-950 text-white font-sans antialiased;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(124, 106, 247, 0.08) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, rgba(45, 212, 160, 0.05) 0%, transparent 60%);
+    min-height: 100vh;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #32324a #12121a;
+  }
+  *::-webkit-scrollbar { width: 6px; }
+  *::-webkit-scrollbar-track { background: #12121a; }
+  *::-webkit-scrollbar-thumb { background: #32324a; border-radius: 3px; }
+}
+
+@layer components {
+  .card {
+    @apply bg-ink-900 border border-ink-700 rounded-xl;
+  }
+  .btn-primary {
+    @apply bg-accent hover:bg-accent-dark text-white font-medium px-4 py-2 rounded-lg transition-all duration-150 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply bg-transparent hover:bg-ink-700 text-white/70 hover:text-white font-medium px-4 py-2 rounded-lg transition-all duration-150;
+  }
+  .btn-danger {
+    @apply bg-rose/10 hover:bg-rose/20 text-rose font-medium px-4 py-2 rounded-lg transition-all duration-150;
+  }
+  .input {
+    @apply bg-ink-800 border border-ink-600 rounded-lg px-3 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-accent transition-colors w-full;
+  }
+  .badge-todo { @apply bg-white/10 text-white/60 text-xs font-mono px-2 py-0.5 rounded-full; }
+  .badge-inprogress { @apply bg-amber/15 text-amber text-xs font-mono px-2 py-0.5 rounded-full; }
+  .badge-done { @apply bg-jade/15 text-jade text-xs font-mono px-2 py-0.5 rounded-full; }
+  .badge-low { @apply bg-jade/15 text-jade text-xs font-mono px-2 py-0.5 rounded-full; }
+  .badge-medium { @apply bg-amber/15 text-amber text-xs font-mono px-2 py-0.5 rounded-full; }
+  .badge-high { @apply bg-rose/15 text-rose text-xs font-mono px-2 py-0.5 rounded-full; }
+}
