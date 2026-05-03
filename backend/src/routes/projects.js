@@ -15,6 +15,7 @@ const getUserRole = (project, userId) => {
   });
   return member ? member.role : null;
 };
+
 // GET /api/projects — get all projects user belongs to
 router.get('/', auth, async (req, res) => {
   try {
@@ -70,7 +71,8 @@ router.get('/:id', auth, async (req, res) => {
 // PUT /api/projects/:id — update project (admin only)
 router.put('/:id', auth, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id)
+      .populate('members.user', 'name email');
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
     const role = getUserRole(project, req.user._id);
@@ -89,7 +91,8 @@ router.put('/:id', auth, async (req, res) => {
 // DELETE /api/projects/:id (admin only)
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id)
+      .populate('members.user', 'name email');
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
     const role = getUserRole(project, req.user._id);
@@ -111,7 +114,8 @@ router.post('/:id/members', auth, [
   if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id)
+      .populate('members.user', 'name email');
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
     const role = getUserRole(project, req.user._id);
@@ -120,7 +124,10 @@ router.post('/:id/members', auth, [
     const userToAdd = await User.findOne({ email: req.body.email });
     if (!userToAdd) return res.status(404).json({ message: 'User not found' });
 
-    const alreadyMember = project.members.some(m => m.user.toString() === userToAdd._id.toString());
+    const alreadyMember = project.members.some(m => {
+      const memberId = m.user._id ? m.user._id.toString() : m.user.toString();
+      return memberId === userToAdd._id.toString();
+    });
     if (alreadyMember) return res.status(409).json({ message: 'User already a member' });
 
     project.members.push({ user: userToAdd._id, role: req.body.role || 'member' });
@@ -135,7 +142,8 @@ router.post('/:id/members', auth, [
 // DELETE /api/projects/:id/members/:userId — remove member (admin only)
 router.delete('/:id/members/:userId', auth, async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findById(req.params.id)
+      .populate('members.user', 'name email');
     if (!project) return res.status(404).json({ message: 'Project not found' });
 
     const role = getUserRole(project, req.user._id);
@@ -145,7 +153,10 @@ router.delete('/:id/members/:userId', auth, async (req, res) => {
       return res.status(400).json({ message: 'Cannot remove yourself' });
     }
 
-    project.members = project.members.filter(m => m.user.toString() !== req.params.userId);
+    project.members = project.members.filter(m => {
+      const memberId = m.user._id ? m.user._id.toString() : m.user.toString();
+      return memberId !== req.params.userId;
+    });
     await project.save();
     await project.populate('members.user', 'name email');
     res.json(project);
