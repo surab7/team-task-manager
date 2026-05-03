@@ -9,10 +9,12 @@ const router = express.Router();
 
 // Helper: get user role in project
 const getUserRole = (project, userId) => {
-  const member = project.members.find(m => m.user.toString() === userId.toString());
+  const member = project.members.find(m => {
+    const memberId = m.user._id ? m.user._id.toString() : m.user.toString();
+    return memberId === userId.toString();
+  });
   return member ? member.role : null;
 };
-
 // GET /api/projects — get all projects user belongs to
 router.get('/', auth, async (req, res) => {
   try {
